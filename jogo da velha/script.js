@@ -1,49 +1,63 @@
+let currentPlayer = 'X';
+let gameBoard = ['', '', '', '', '', '', '', '', ''];
 
+const winningCombos = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6]
+];
 
+const board = document.getElementById('board');
+const status = document.getElementById('status');
 
+function checkWinner() {
+    for (const combo of winningCombos) {
+        const [a, b, c] = combo;
+        if (gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]) {
+            return gameBoard[a];
+        }
+    }
+    return null;
+}
 
+function checkDraw() {
+    return !gameBoard.includes('');
+}
 
-class Game{
-	constructor(){
-		
-		this.state_jogador = true
-		this.jogador1 = []
-		this.jogador2 = []
-		
-		this.box1 = document.getElementById("box1")
-		this.box2 = document.getElementById("box2")
-		this.box3 = document.getElementById("box3")
-		this.box4 = document.getElementById("box4")
-		this.box5 = document.getElementById("box5")
-		this.box6 = document.getElementById("box6")
-		this.box7 = document.getElementById("box7")
-		this.box8 = document.getElementById("box8")
-		this.box9 = document.getElementById("box9")
-		
-		this.button = document.getElementById("reset")
-		
-	}
-	
-	
-	type_gamer(index,box){
-		if(this.jogador){
-			this.state_jogador = false
-			this.jogador1.push(index)
-			box.classList.add("jogador1")
-		}
-		else{
-			this.state_jogador = true
-			this.jogador2.push(index)
-			box.classList.add("jogador2")
-		}
-	}
-	
-	this.box1.addEventListener("click", () => {
-		this.type_gamer(1,this.box1)
-		
-		console.log(this.jogador,this.jogador1)
-		
-	})
-	
-	
+function handleClick(index) {
+    if (gameBoard[index] === '' && !checkWinner() && !checkDraw()) {
+        gameBoard[index] = currentPlayer;
+        document.getElementById(index).textContent = currentPlayer;
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        status.textContent = `É a vez do Jogador ${currentPlayer}`;
+    }
+
+    const winner = checkWinner();
+    if (winner) {
+        status.textContent = `O Jogador ${winner} venceu!`;
+    } else if (checkDraw()) {
+        status.textContent = 'Empate!';
+    }
+}
+
+function resetBoard() {
+    gameBoard = ['', '', '', '', '', '', '', '', ''];
+    currentPlayer = 'X';
+    status.textContent = 'É a vez do Jogador X';
+
+    const squares = document.querySelectorAll('.square');
+    squares.forEach(square => square.textContent = '');
+}
+
+for (let i = 0; i < 9; i++) {
+    const square = document.createElement('div');
+    square.classList.add('square');
+    square.setAttribute('id', i);
+    square.addEventListener('click', () => handleClick(i));
+    board.appendChild(square);
 }
